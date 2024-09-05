@@ -1,0 +1,11 @@
+[
+    { "id": 1, "nombre": "Pez Betta", "precio": 10.00 },
+    { "id": 2, "nombre": "Pez Guppy", "precio": 8.00 },
+    { "id": 3, "nombre": "Pez Ángel", "precio": 15.00 },
+    { "id": 4, "nombre": "Pez Disco", "precio": 25.00 },
+    { "id": 5, "nombre": "Pez Cebra", "precio": 6.00 },
+    { "id": 6, "nombre": "Pez Neon", "precio": 5.00 },
+    { "id": 7, "nombre": "Pez Goldfish", "precio": 4.00 },
+    { "id": 8, "nombre": "Pez Moly", "precio": 7.00 },
+    { "id": 9, "nombre": "Pez Platy", "precio": 6.00 }
+]

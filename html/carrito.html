@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carrito de Compra</title>
+    <link rel="stylesheet" href="../css/main.css">
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <nav class="navbar custom-navbar">
+            <div class="container-fluid">
+                <img src="../assets/logo.jpeg" alt="logoinicial" class="navbar-logo">
+                <a class="nav-link active" aria-current="page" href="../index.html">Home</a>
+                <a class="nav-link" href="./html/carrito.html">Carrito</a>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section id="carrito">
+            <h2>Carrito de Compras</h2>
+            <div id="carrito-items"></div>
+            <div>
+                <button id="vaciar-carrito">Vaciar Carrito</button>
+            </div>
+        </section>
+
+        <section>
+            <div id="cart-summary">
+                <p>El total del carrito es de:</p>
+                <p id="total-price">$0.00</p>
+                <button id="finalizar-compra" class="btn btn-primary">Finalizar Compra</button>
+            </div>
+        </section>
+    </main>
+
+    <script src="../js/script.js"></script>
+    <script src="../js/eventos.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</body>
+
+</html>
