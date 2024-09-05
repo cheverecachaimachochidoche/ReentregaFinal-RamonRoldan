@@ -37,7 +37,6 @@ function mostrarCarrito() {
     const carritoItems = document.getElementById('carrito-items');
     const totalPrice = document.getElementById('total-price');
 
-    // Verifica si los elementos del carrito existen en el DOM antes de continuar
     if (!carritoItems || !totalPrice) {
         console.error('Elementos del carrito no encontrados en el DOM');
         return;
@@ -48,11 +47,15 @@ function mostrarCarrito() {
     carritoItems.innerHTML = '';
 
     let productosAgrupados = carrito.reduce((acc, producto) => {
-        let id = producto.id;
-        if (!acc[id]) {
-            acc[id] = { ...producto, cantidad: 0 };
+        if (producto && producto.id) {
+            let id = producto.id;
+            if (!acc[id]) {
+                acc[id] = { ...producto, cantidad: 0 };
+            }
+            acc[id].cantidad += 1;
+        } else {
+            console.error('Producto inválido en el carrito:', producto);
         }
-        acc[id].cantidad += 1;
         return acc;
     }, {});
 
@@ -74,6 +77,7 @@ function mostrarCarrito() {
 
     totalPrice.textContent = '$' + total.toFixed(2);
 }
+
 
 function obtenerCarrito() {
     if (localStorage.getItem('carrito')) {
