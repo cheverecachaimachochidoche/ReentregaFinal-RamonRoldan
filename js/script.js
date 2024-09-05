@@ -29,11 +29,12 @@ function agregarCarrito(e) {
 }
 
 function mostrarCarrito() {
+    // Verificamos si estamos en la página del carrito y si los elementos existen
     const carritoItems = document.getElementById('carrito-items');
     const totalPrice = document.getElementById('total-price');
 
     if (!carritoItems || !totalPrice) {
-        console.error('Elementos del carrito no encontrados en el DOM');
+        console.error('Elementos del carrito no encontrados en el DOM. Asegúrate de que este script se ejecute en la página correcta.');
         return;
     }
 
@@ -41,18 +42,13 @@ function mostrarCarrito() {
     let total = 0;
     carritoItems.innerHTML = '';
 
-    // Verificar que los productos en el carrito existen en el archivo JSON
+    // Agrupar productos por cantidad
     let productosAgrupados = carrito.reduce((acc, producto) => {
-        const productoValido = productos.find(p => p.id === producto.id);
-        if (productoValido) {
-            let id = producto.id;
-            if (!acc[id]) {
-                acc[id] = { ...producto, cantidad: 0 };
-            }
-            acc[id].cantidad += 1;
-        } else {
-            console.error('Producto inválido o no encontrado en el JSON:', producto);
+        let id = producto.id;
+        if (!acc[id]) {
+            acc[id] = { ...producto, cantidad: 0 };
         }
+        acc[id].cantidad += 1;
         return acc;
     }, {});
 
@@ -86,5 +82,10 @@ function obtenerCarrito() {
 }
 
 function cargarCarrito() {
-    mostrarCarrito();
+    // Verificar si los elementos del carrito están en el DOM antes de llamar a mostrarCarrito
+    if (document.getElementById('carrito-items') && document.getElementById('total-price')) {
+        mostrarCarrito();
+    } else {
+        console.log('No se ejecuta cargarCarrito, ya que no es la página del carrito.');
+    }
 }
