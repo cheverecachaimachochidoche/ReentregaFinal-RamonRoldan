@@ -2,7 +2,7 @@ let productos = [];
 
 document.addEventListener('DOMContentLoaded', () => {
     fetch('https://cheverecachaimachochidoche.github.io/Tercera-Entrega-RamonRoldan/db/main.json')
-    .then(response => {
+        .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
@@ -26,6 +26,13 @@ function agregarCarrito(e) {
 
 function mostrarCarrito() {
     const carritoItems = document.getElementById('carrito-items');
+    const totalPrice = document.getElementById('total-price');
+
+    if (!carritoItems || !totalPrice) {
+        console.error('Elementos del carrito no encontrados en el DOM');
+        return;
+    }
+
     let carrito = obtenerCarrito();
     let total = 0;
     carritoItems.innerHTML = '';
@@ -55,7 +62,7 @@ function mostrarCarrito() {
         total += producto.precio * producto.cantidad;
     }
 
-    document.getElementById('total-price').textContent = '$' + total.toFixed(2);
+    totalPrice.textContent = '$' + total.toFixed(2);
 }
 
 function obtenerCarrito() {
