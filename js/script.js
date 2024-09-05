@@ -10,7 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(data => {
             productos = data;
-            cargarCarrito();
+            // Solo carga el carrito si los elementos del carrito están en la página
+            const carritoItems = document.getElementById('carrito-items');
+            const totalPrice = document.getElementById('total-price');
+            if (carritoItems && totalPrice) {
+                cargarCarrito();
+            }
         })
         .catch(error => console.error('Error al cargar los productos:', error));
 });
@@ -32,6 +37,7 @@ function mostrarCarrito() {
     const carritoItems = document.getElementById('carrito-items');
     const totalPrice = document.getElementById('total-price');
 
+    // Verifica si los elementos del carrito existen en el DOM antes de continuar
     if (!carritoItems || !totalPrice) {
         console.error('Elementos del carrito no encontrados en el DOM');
         return;
