@@ -18,6 +18,10 @@ document.addEventListener('DOMContentLoaded', () => {
 function agregarCarrito(e) {
     const idProducto = parseInt(e.target.getAttribute('data-id'));
     const producto = productos.find(p => p.id === idProducto);
+    if (!producto) {
+        console.error('Producto no encontrado:', idProducto);
+        return;
+    }
     let carrito = obtenerCarrito();
     carrito.push(producto);
     localStorage.setItem('carrito', JSON.stringify(carrito));
