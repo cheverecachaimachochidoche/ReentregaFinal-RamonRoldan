@@ -1,7 +1,7 @@
 let productos = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-    fetch('https://cheverecachaimachochidoche.github.io/Tercera-Entrega-RamonRoldan/db/main.json')
+    fetch('../db/main.json')
         .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
@@ -18,10 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
 function agregarCarrito(e) {
     const idProducto = parseInt(e.target.getAttribute('data-id'));
     const producto = productos.find(p => p.id === idProducto);
-    if (!producto) {
-        console.error('Producto no encontrado:', idProducto);
-        return;
-    }
     let carrito = obtenerCarrito();
     carrito.push(producto);
     localStorage.setItem('carrito', JSON.stringify(carrito));
@@ -29,20 +25,11 @@ function agregarCarrito(e) {
 }
 
 function mostrarCarrito() {
-    // Verificamos si estamos en la página del carrito y si los elementos existen
     const carritoItems = document.getElementById('carrito-items');
-    const totalPrice = document.getElementById('total-price');
-
-    if (!carritoItems || !totalPrice) {
-        console.error('Elementos del carrito no encontrados en el DOM. Asegúrate de que este script se ejecute en la página correcta.');
-        return;
-    }
-
     let carrito = obtenerCarrito();
     let total = 0;
     carritoItems.innerHTML = '';
 
-    // Agrupar productos por cantidad
     let productosAgrupados = carrito.reduce((acc, producto) => {
         let id = producto.id;
         if (!acc[id]) {
@@ -68,24 +55,48 @@ function mostrarCarrito() {
         total += producto.precio * producto.cantidad;
     }
 
-    totalPrice.textContent = '$' + total.toFixed(2);
+    document.getElementById('total-price').textContent = '$' + total.toFixed(2);
 }
 
 function obtenerCarrito() {
-    try {
-        const carrito = localStorage.getItem('carrito');
-        return carrito ? JSON.parse(carrito) : [];
-    } catch (error) {
-        console.error('Error al obtener el carrito del localStorage:', error);
+    if (localStorage.getItem('carrito')) {
+        return JSON.parse(localStorage.getItem('carrito'));
+    } else {
         return [];
     }
 }
 
 function cargarCarrito() {
-    // Verificar si los elementos del carrito están en el DOM antes de llamar a mostrarCarrito
-    if (document.getElementById('carrito-items') && document.getElementById('total-price')) {
+    mostrarCarrito();
+}
+
+function finalizarCompra() {
+    try {
+        let carrito = obtenerCarrito();
+
+        if (carrito.length === 0) {
+            throw new Error('El carrito está vacío, no se puede procesar la compra.');
+        }
+
+        console.log("Procesando la compra...");
+
+        Swal.fire({
+            title: 'Compra finalizada!!!',
+            text: 'Tu compra ha sido completada con éxito.',
+            icon: 'success',
+            confirmButtonText: 'Aceptar'
+        });
+
+    } catch (error) {
+        Swal.fire({
+            title: 'Error!',
+            text: `Hubo un problema al procesar la compra: ${error.message}`,
+            icon: 'error',
+            confirmButtonText: 'Aceptar'
+        });
+        console.error('Error al finalizar la compra:', error);
+    } finally {
+        localStorage.removeItem('carrito');
         mostrarCarrito();
-    } else {
-        console.log('No se ejecuta cargarCarrito, ya que no es la página del carrito.');
     }
 }
