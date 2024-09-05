@@ -1,8 +1,8 @@
 let productos = [];
 
 document.addEventListener('DOMContentLoaded', () => {
-    fetch('https://github.com/cheverecachaimachochidoche/Tercera-Entrega-RamonRoldan/tree/main/db/main.json')
-        .then(response => {
+    fetch('https://cheverecachaimachochidoche.github.io/Tercera-Entrega-RamonRoldan/db/main.json')
+    .then(response => {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
