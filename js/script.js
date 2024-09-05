@@ -10,12 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(data => {
             productos = data;
-            // Solo carga el carrito si los elementos del carrito están en la página
-            const carritoItems = document.getElementById('carrito-items');
-            const totalPrice = document.getElementById('total-price');
-            if (carritoItems && totalPrice) {
-                cargarCarrito();
-            }
+            cargarCarrito();
         })
         .catch(error => console.error('Error al cargar los productos:', error));
 });
@@ -46,15 +41,17 @@ function mostrarCarrito() {
     let total = 0;
     carritoItems.innerHTML = '';
 
+    // Verificar que los productos en el carrito existen en el archivo JSON
     let productosAgrupados = carrito.reduce((acc, producto) => {
-        if (producto && producto.id) {
+        const productoValido = productos.find(p => p.id === producto.id);
+        if (productoValido) {
             let id = producto.id;
             if (!acc[id]) {
                 acc[id] = { ...producto, cantidad: 0 };
             }
             acc[id].cantidad += 1;
         } else {
-            console.error('Producto inválido en el carrito:', producto);
+            console.error('Producto inválido o no encontrado en el JSON:', producto);
         }
         return acc;
     }, {});
@@ -78,46 +75,16 @@ function mostrarCarrito() {
     totalPrice.textContent = '$' + total.toFixed(2);
 }
 
-
 function obtenerCarrito() {
-    if (localStorage.getItem('carrito')) {
-        return JSON.parse(localStorage.getItem('carrito'));
-    } else {
+    try {
+        const carrito = localStorage.getItem('carrito');
+        return carrito ? JSON.parse(carrito) : [];
+    } catch (error) {
+        console.error('Error al obtener el carrito del localStorage:', error);
         return [];
     }
 }
 
 function cargarCarrito() {
     mostrarCarrito();
-}
-
-function finalizarCompra() {
-    try {
-        let carrito = obtenerCarrito();
-
-        if (carrito.length === 0) {
-            throw new Error('El carrito está vacío, no se puede procesar la compra.');
-        }
-
-        console.log("Procesando la compra...");
-
-        Swal.fire({
-            title: 'Compra finalizada!!!',
-            text: 'Tu compra ha sido completada con éxito.',
-            icon: 'success',
-            confirmButtonText: 'Aceptar'
-        });
-
-    } catch (error) {
-        Swal.fire({
-            title: 'Error!',
-            text: `Hubo un problema al procesar la compra: ${error.message}`,
-            icon: 'error',
-            confirmButtonText: 'Aceptar'
-        });
-        console.error('Error al finalizar la compra:', error);
-    } finally {
-        localStorage.removeItem('carrito');
-        mostrarCarrito();
-    }
 }
