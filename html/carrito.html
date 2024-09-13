@@ -25,22 +25,42 @@
             <h2>Carrito de Compras</h2>
             <div id="carrito-items"></div>
             <div>
-                <button id="vaciar-carrito">Vaciar Carrito</button>
+                <button id="vaciar-carrito" class="btn btn-danger" style="display: none;">Vaciar Carrito</button>
             </div>
         </section>
 
         <section>
             <div id="cart-summary">
-                <p>El total del carrito es de:</p>
-                <p id="total-price">$0.00</p>
-                <button id="finalizar-compra" class="btn btn-primary">Finalizar Compra</button>
+
+                <button id="finalizar-compra" class="btn btn-primary" style="display: none;">Finalizar Compra</button>
             </div>
         </section>
-    </main>
 
-    <script src="../js/script.js"></script>
-    <script src="../js/eventos.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-</body>
-
-</html>
+        <!-- Resumen y Formulario de Checkout -->
+        <section id="checkout-section" style="display: none;">
+            <h2>Resumen de Compra</h2>
+            <div id="resumen-compra"></div>
+            <form id="form-checkout">
+                <h3>Formulario de Checkout</h3>
+                <div class="form-group">
+                    <label for="nombre">Nombre:</label>
+                    <input type="text" class="form-control" id="nombre" required>
+                </div>
+                <div class="form-group">
+                    <label for="direccion">Dirección:</label>
+                    <input type="text" class="form-control" id="direccion" required>
+                </div>
+                <div class="form-group">
+                    <label for="email">Correo Electrónico:</label>
+                    <input type="email" class="form-control" id="email" required>
+                </div>
+                <button type="submit" class="btn btn-success">Confirmar Compra</button>
+            </form>
+            
+        </section>
+    
+        <script src="../js/script.js"></script>
+        <script src="../js/eventos.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    </body>
+    </html>
