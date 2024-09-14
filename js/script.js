@@ -215,6 +215,6 @@ function manejo(event) {
         localStorage.removeItem('carrito');
         mostrarCarrito();
         document.getElementById('checkout-section').style.display = 'none';
-        window.location.href = 'index.html'; // Redirigir a la página de inicio
+        window.location.href = '../index.html'; // Asegúrate de que la ruta sea correcta
     });
 }
