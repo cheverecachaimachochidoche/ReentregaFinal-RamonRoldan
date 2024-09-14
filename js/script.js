@@ -1,20 +1,25 @@
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('finalizar-compra')?.addEventListener('click', finalizarCompra);
+    document.getElementById('vaciar-carrito')?.addEventListener('click', vaciarCarrito);
+    document.getElementById('form-checkout')?.addEventListener('submit', manejo);
+    mostrarCarrito();
+});
+
 let productos = [];
 
 // Cargar productos del archivo JSON
-document.addEventListener('DOMContentLoaded', () => {
-    fetch('https://cheverecachaimachochidoche.github.io/Tercera-Entrega-RamonRoldan/db/main.json')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            productos = data;
-            mostrarCarrito();
-        })
-        .catch(error => console.error('Error al cargar los productos:', error));
-});
+fetch('https://cheverecachaimachochidoche.github.io/Tercera-Entrega-RamonRoldan/db/main.json')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        productos = data;
+        mostrarCarrito();
+    })
+    .catch(error => console.error('Error al cargar los productos:', error));
 
 function agregarCarrito(e) {
     const idProducto = parseInt(e.target.getAttribute('data-id'));
@@ -118,8 +123,6 @@ function disminuirCantidad(id) {
         mostrarCarrito();
     }
 }
-    
-
 
 function eliminarProducto(id) {
     let carrito = obtenerCarrito();
@@ -129,11 +132,7 @@ function eliminarProducto(id) {
 }
 
 function obtenerCarrito() {
-    if (localStorage.getItem('carrito')) {
-        return JSON.parse(localStorage.getItem('carrito'));
-    } else {
-        return [];
-    }
+    return JSON.parse(localStorage.getItem('carrito')) || [];
 }
 
 function actualizarUI() {
@@ -164,7 +163,7 @@ function vaciarCarrito() {
 }
 
 function finalizarCompra() {
-    const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
+    const carrito = obtenerCarrito();
     if (carrito.length === 0) {
         Swal.fire({
             icon: 'error',
@@ -199,22 +198,23 @@ function finalizarCompra() {
 
     resumenHTML += `<li>Total: $${totalGeneral.toFixed(2)}</li></ul>`;
     document.getElementById('resumen-compra').innerHTML = resumenHTML;
+
     document.getElementById('checkout-section').style.display = 'block';
     document.getElementById('carrito').style.display = 'none';
-    document.getElementById('total-price').style.display = 'none';
+    document.getElementById('cart-summary').style.display = 'none';
+}
 
-    document.getElementById('form-checkout').addEventListener('submit', function (event) {
-        event.preventDefault();
+function manejo(event) {
+    event.preventDefault();
 
-        Swal.fire({
-            icon: 'success',
-            title: 'Compra confirmada',
-            text: 'Gracias por tu compra. Pronto recibirás tu pedido.'
-        }).then(() => {
-            localStorage.removeItem('carrito');
-            mostrarCarrito();
-            document.getElementById('checkout-section').style.display = 'none';
-            window.location.href = 'index.html'; // Redirigir a la página de inicio
-        });
+    Swal.fire({
+        icon: 'success',
+        title: 'Compra confirmada',
+        text: 'Gracias por tu compra. Pronto recibirás tu pedido.'
+    }).then(() => {
+        localStorage.removeItem('carrito');
+        mostrarCarrito();
+        document.getElementById('checkout-section').style.display = 'none';
+        window.location.href = 'index.html'; // Redirigir a la página de inicio
     });
 }
