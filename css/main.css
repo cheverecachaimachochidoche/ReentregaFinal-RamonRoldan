@@ -93,3 +93,36 @@ header {
   align-items: flex-start;
   padding-top: 220px;
 }
+
+
+#carrito-items {
+  display: flex;
+  flex-direction: column;
+}
+
+#carrito-items > div {
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+#carrito-items .card-title {
+  font-size: 1.1em;
+  margin: 0;
+}
+
+#carrito-items .btn {
+  margin-left: 5px; /* Espaciado entre los botones */
+}
+
+#carrito-items p {
+  margin: 0;
+}
+
+#carrito-items .text-primary {
+  font-weight: bold;
+}

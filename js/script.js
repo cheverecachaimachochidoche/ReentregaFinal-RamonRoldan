@@ -1,6 +1,5 @@
 let productos = [];
 
-// Cargar productos del archivo JSON
 document.addEventListener('DOMContentLoaded', () => {
     fetch('https://cheverecachaimachochidoche.github.io/Tercera-Entrega-RamonRoldan/db/main.json')
         .then(response => {
@@ -29,21 +28,19 @@ function agregarCarrito(e) {
     const productoEnCarrito = carrito.find(p => p.id === idProducto);
 
     if (productoEnCarrito) {
-        // Si ya está en el carrito, incrementar la cantidad
         productoEnCarrito.cantidad += 1;
     } else {
-        // Si no está, añadir con cantidad 1
         carrito.push({ ...producto, cantidad: 1 });
     }
 
     localStorage.setItem('carrito', JSON.stringify(carrito));
 
-    // Mostrar notificación con SweetAlert
     Swal.fire({
         title: 'Producto añadido al carrito',
         text: `${producto.nombre} ha sido añadido.`,
         icon: 'success',
-        confirmButtonText: 'Aceptar'
+        timer: 800,
+        showConfirmButton: false
     });
 
     mostrarCarrito();
@@ -65,7 +62,7 @@ function mostrarCarrito() {
 
     carrito.forEach(producto => {
         const div = document.createElement('div');
-        const totalPorItem = producto.precio * producto.cantidad; // Calcular el total por ítem
+        const totalPorItem = producto.precio * producto.cantidad;
         div.innerHTML = `
             <div>
                 <h5 class="card-title">${producto.nombre}</h5>
@@ -77,12 +74,12 @@ function mostrarCarrito() {
             </div>
         `;
         carritoItems.appendChild(div);
-        total += totalPorItem; // Sumar al total del carrito
+        total += totalPorItem;
     });
 
     const totalPrice = document.getElementById('total-price');
     if (totalPrice) {
-        totalPrice.textContent = 'Total del Carrito: $' + total.toFixed(2); // Mostrar el total del carrito
+        totalPrice.textContent = 'Total del Carrito: $' + total.toFixed(2);
     }
     actualizarUI();
 }
@@ -106,14 +103,11 @@ function disminuirCantidad(id) {
 
     if (producto) {
         if (producto.cantidad > 1) {
-            // Si la cantidad es mayor a 1, la disminuimos
             carrito[index].cantidad -= 1;
         } else {
-            // Si la cantidad es 1 o menor, eliminamos el producto
-            carrito.splice(index, 1); // Elimina el producto del carrito
+            carrito.splice(index, 1);
         }
 
-        // Actualizamos el carrito en LocalStorage
         localStorage.setItem('carrito', JSON.stringify(carrito));
         mostrarCarrito();
     }
@@ -176,7 +170,6 @@ function finalizarCompra() {
     const productosCount = {};
     let totalGeneral = 0;
 
-    // Agrupar los productos por nombre y contar la cantidad total
     carrito.forEach(producto => {
         if (productosCount[producto.nombre]) {
             productosCount[producto.nombre].cantidad += producto.cantidad;
@@ -188,7 +181,6 @@ function finalizarCompra() {
         }
     });
 
-    // Generar el HTML para el resumen de la compra
     Object.keys(productosCount).forEach(nombre => {
         const cantidad = productosCount[nombre].cantidad;
         const precio = productosCount[nombre].precio;
@@ -200,16 +192,14 @@ function finalizarCompra() {
     resumenHTML += `<li>Total: $${totalGeneral.toFixed(2)}</li></ul>`;
     document.getElementById('resumen-compra').innerHTML = resumenHTML;
 
-    // Mostrar la sección de checkout
     document.getElementById('checkout-section').style.display = 'block';
     document.getElementById('carrito').style.display = 'none';
     document.getElementById('cart-summary').style.display = 'none';
 
-    // Asegúrate de remover eventos previos
     const form = document.getElementById('form-checkout');
     if (form) {
-        form.removeEventListener('submit', manejo); // Eliminar manejador previo
-        form.addEventListener('submit', manejo); // Agregar manejador
+        form.removeEventListener('submit', manejo);
+        form.addEventListener('submit', manejo);
     }
 }
 
@@ -224,6 +214,6 @@ function manejo(event) {
         localStorage.removeItem('carrito');
         mostrarCarrito();
         document.getElementById('checkout-section').style.display = 'none';
-        window.location.href = '../index.html'; // Redirigir a la página de inicio
+        window.location.href = '../index.html';
     });
 }
