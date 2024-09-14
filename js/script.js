@@ -17,6 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
 function agregarCarrito(e) {
     const idProducto = parseInt(e.target.getAttribute('data-id'));
+    if (isNaN(idProducto)) {
+        console.error('ID del producto no válido');
+        return;
+    }
+
     const producto = productos.find(p => p.id === idProducto);
 
     if (!producto) {
@@ -45,6 +50,7 @@ function agregarCarrito(e) {
 
     mostrarCarrito();
 }
+
 
 function mostrarCarrito() {
     const carritoItems = document.getElementById('carrito-items');
