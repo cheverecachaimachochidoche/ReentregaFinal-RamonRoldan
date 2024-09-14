@@ -1,6 +1,6 @@
 let productos = [];
 
-// Esperar que el DOM esté cargado
+// Cargar productos del archivo JSON
 document.addEventListener('DOMContentLoaded', () => {
     fetch('https://cheverecachaimachochidoche.github.io/Tercera-Entrega-RamonRoldan/db/main.json')
         .then(response => {
@@ -11,17 +11,31 @@ document.addEventListener('DOMContentLoaded', () => {
         })
         .then(data => {
             productos = data;
-            cargarCarrito();
+            mostrarCarrito();
         })
         .catch(error => console.error('Error al cargar los productos:', error));
 });
 
-// Función para agregar productos al carrito
 function agregarCarrito(e) {
     const idProducto = parseInt(e.target.getAttribute('data-id'));
     const producto = productos.find(p => p.id === idProducto);
+
+    if (!producto) {
+        console.error('Producto no encontrado');
+        return;
+    }
+
     let carrito = obtenerCarrito();
-    carrito.push(producto);
+    const productoEnCarrito = carrito.find(p => p.id === idProducto);
+
+    if (productoEnCarrito) {
+        // Si ya está en el carrito, incrementar la cantidad
+        productoEnCarrito.cantidad += 1;
+    } else {
+        // Si no está, añadir con cantidad 1
+        carrito.push({ ...producto, cantidad: 1 });
+    }
+
     localStorage.setItem('carrito', JSON.stringify(carrito));
 
     // Mostrar notificación con SweetAlert
@@ -35,23 +49,26 @@ function agregarCarrito(e) {
     mostrarCarrito();
 }
 
-// Función para mostrar los productos en el carrito
 function mostrarCarrito() {
     const carritoItems = document.getElementById('carrito-items');
-    if (!carritoItems) return; // Verificar si el elemento existe
+    if (!carritoItems) return;
 
     let carrito = obtenerCarrito();
     let total = 0;
     carritoItems.innerHTML = '';
 
-    let productosAgrupados = carrito.reduce((acc, producto) => {
-        let id = producto.id;
-        if (!acc[id]) {
-            acc[id] = { ...producto, cantidad: 0 };
+    if (carrito.length === 0) {
+        carritoItems.innerHTML = '<p>El carrito está vacío.</p>';
+        actualizarUI();
+        return;
+    }
+
+    const productosAgrupados = {};
+    carrito.forEach(producto => {
+        if (!productosAgrupados[producto.id]) {
+            productosAgrupados[producto.id] = { ...producto };
         }
-        acc[id].cantidad += 1;
-        return acc;
-    }, {});
+    });
 
     for (let id in productosAgrupados) {
         let producto = productosAgrupados[id];
@@ -64,7 +81,8 @@ function mostrarCarrito() {
                 <button class="btn btn-success" onclick="incrementarCantidad(${producto.id})">+</button>
                 <button class="btn btn-danger" onclick="disminuirCantidad(${producto.id})">-</button>
                 <button class="btn btn-secondary" onclick="eliminarProducto(${producto.id})">Eliminar</button>
-            </div>`;
+            </div>
+        `;
         carritoItems.appendChild(div);
         total += producto.precio * producto.cantidad;
     }
@@ -79,24 +97,33 @@ function mostrarCarrito() {
 function incrementarCantidad(id) {
     let carrito = obtenerCarrito();
     const producto = carrito.find(p => p.id === id);
-    carrito.push(producto);  // Añade otra unidad
-    localStorage.setItem('carrito', JSON.stringify(carrito));
-    mostrarCarrito();
-}
+    const index = carrito.indexOf(producto);
 
-function disminuirCantidad(id) {
-    let carrito = obtenerCarrito();
-    const index = carrito.findIndex(p => p.id === id);
-    if (index !== -1) {
-        carrito.splice(index, 1);  // Remueve una unidad
+    if (producto) {
+        carrito[index].cantidad += 1;
         localStorage.setItem('carrito', JSON.stringify(carrito));
         mostrarCarrito();
     }
 }
 
+function disminuirCantidad(id) {
+    let carrito = obtenerCarrito();
+    const producto = carrito.find(p => p.id === id);
+    const index = carrito.indexOf(producto);
+
+    if (producto.cantidad > 1) {
+        carrito[index].cantidad -= 1;
+    } else {
+        eliminarProducto(id);
+    }
+
+    localStorage.setItem('carrito', JSON.stringify(carrito));
+    mostrarCarrito();
+}
+
 function eliminarProducto(id) {
     let carrito = obtenerCarrito();
-    carrito = carrito.filter(p => p.id !== id);  // Elimina todas las unidades del producto
+    carrito = carrito.filter(p => p.id !== id);
     localStorage.setItem('carrito', JSON.stringify(carrito));
     mostrarCarrito();
 }
@@ -109,20 +136,24 @@ function obtenerCarrito() {
     }
 }
 
-function cargarCarrito() {
-    mostrarCarrito();
-}
-
 function actualizarUI() {
     const carrito = obtenerCarrito();
-    const finalizarCompra = document.getElementById('finalizar-compra');
+    const finalizarCompraBtn = document.getElementById('finalizar-compra');
+    const vaciarCarritoBtn = document.getElementById('vaciar-carrito');
+
     if (carrito.length === 0) {
-        if (finalizarCompra) {
-            finalizarCompra.style.display = 'none';
+        if (finalizarCompraBtn) {
+            finalizarCompraBtn.style.display = 'none';
+        }
+        if (vaciarCarritoBtn) {
+            vaciarCarritoBtn.style.display = 'none';
         }
     } else {
-        if (finalizarCompra) {
-            finalizarCompra.style.display = 'block';
+        if (finalizarCompraBtn) {
+            finalizarCompraBtn.style.display = 'block';
+        }
+        if (vaciarCarritoBtn) {
+            vaciarCarritoBtn.style.display = 'block';
         }
     }
 }
@@ -132,7 +163,6 @@ function vaciarCarrito() {
     mostrarCarrito();
 }
 
-// Función para finalizar la compra
 function finalizarCompra() {
     const carrito = JSON.parse(localStorage.getItem('carrito')) || [];
     if (carrito.length === 0) {
@@ -144,11 +174,10 @@ function finalizarCompra() {
         return;
     }
 
-    let resumenHTML = ''; // Inicializar la variable sin el título
-    const productosCount = {}; // Objeto para almacenar la cantidad de cada producto
-    let totalGeneral = 0; // Variable para almacenar el total de todos los productos
+    let resumenHTML = '<h3>Resumen de Compra</h3><ul>';
+    const productosCount = {};
+    let totalGeneral = 0;
 
-    // Iterar sobre el carrito y contar la cantidad de cada producto
     carrito.forEach(producto => {
         if (productosCount[producto.nombre]) {
             productosCount[producto.nombre].cantidad++;
@@ -160,47 +189,32 @@ function finalizarCompra() {
         }
     });
 
-    // Iterar sobre el objeto de productos y generar el resumen
-    resumenHTML += '<h3>Resumen de Compra</h3><ul>'; // Agregar el título solo una vez
     Object.keys(productosCount).forEach(producto => {
         const cantidad = productosCount[producto].cantidad;
         const precio = productosCount[producto].precio;
         const total = cantidad * precio;
-        totalGeneral += total; // Sumar el total de cada producto al total general
+        totalGeneral += total;
         resumenHTML += `<li>${cantidad} x ${producto} - $${total.toFixed(2)}</li>`;
     });
 
-    resumenHTML += `<li>Total: $${totalGeneral.toFixed(2)}</li>`; // Mostrar el total general
-    resumenHTML += '</ul>';
-
-    // Muestra el resumen en la página
+    resumenHTML += `<li>Total: $${totalGeneral.toFixed(2)}</li></ul>`;
     document.getElementById('resumen-compra').innerHTML = resumenHTML;
-
-    // Muestra el formulario de checkout
     document.getElementById('checkout-section').style.display = 'block';
-
-    // Oculta la pantalla previa de carrito de compras
     document.getElementById('carrito').style.display = 'none';
     document.getElementById('total-price').style.display = 'none';
 
-    // Asignar evento al botón de confirmar compra
     document.getElementById('form-checkout').addEventListener('submit', function (event) {
-        event.preventDefault(); // Evitar el envío del formulario
+        event.preventDefault();
 
         Swal.fire({
             icon: 'success',
             title: 'Compra confirmada',
             text: 'Gracias por tu compra. Pronto recibirás tu pedido.'
+        }).then(() => {
+            localStorage.removeItem('carrito');
+            mostrarCarrito();
+            document.getElementById('checkout-section').style.display = 'none';
+            window.location.href = 'index.html'; // Redirigir a la página de inicio
         });
-
-        // Limpiar carrito
-        localStorage.removeItem('carrito');
-        mostrarCarrito(); // Actualizar la UI para reflejar que el carrito está vacío
-
-        // Ocultar el formulario de checkout tras la compra
-        document.getElementById('checkout-section').style.display = 'none';
-
-        // Redirigir a la página de inicio
-        window.location.href = '/'; // Cambia esta URL a la página de inicio de tu sitio
     });
 }
