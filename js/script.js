@@ -63,33 +63,26 @@ function mostrarCarrito() {
         return;
     }
 
-    const productosAgrupados = {};
     carrito.forEach(producto => {
-        if (!productosAgrupados[producto.id]) {
-            productosAgrupados[producto.id] = { ...producto };
-        }
-    });
-
-    for (let id in productosAgrupados) {
-        let producto = productosAgrupados[id];
         const div = document.createElement('div');
+        const totalPorItem = producto.precio * producto.cantidad; // Calcular el total por ítem
         div.innerHTML = `
             <div>
                 <h5 class="card-title">${producto.nombre}</h5>
                 <p>Cantidad: ${producto.cantidad}</p>
-                <p class="text-primary"><strong>$${producto.precio.toFixed(2)}</strong></p>
+                <p class="text-primary"><strong>Total: $${totalPorItem.toFixed(2)}</strong></p>
                 <button class="btn btn-success" onclick="incrementarCantidad(${producto.id})">+</button>
                 <button class="btn btn-danger" onclick="disminuirCantidad(${producto.id})">-</button>
                 <button class="btn btn-secondary" onclick="eliminarProducto(${producto.id})">Eliminar</button>
             </div>
         `;
         carritoItems.appendChild(div);
-        total += producto.precio * producto.cantidad;
-    }
+        total += totalPorItem; // Sumar al total del carrito
+    });
 
     const totalPrice = document.getElementById('total-price');
     if (totalPrice) {
-        totalPrice.textContent = '$' + total.toFixed(2);
+        totalPrice.textContent = 'Total del Carrito: $' + total.toFixed(2); // Mostrar el total del carrito
     }
     actualizarUI();
 }
@@ -111,15 +104,22 @@ function disminuirCantidad(id) {
     const producto = carrito.find(p => p.id === id);
     const index = carrito.indexOf(producto);
 
-    if (producto.cantidad > 1) {
-        carrito[index].cantidad -= 1;
-    } else {
-        eliminarProducto(id);
-    }
+    if (producto) {
+        if (producto.cantidad > 1) {
+            // Si la cantidad es mayor a 1, la disminuimos
+            carrito[index].cantidad -= 1;
+        } else {
+            // Si la cantidad es 1 o menor, eliminamos el producto
+            carrito.splice(index, 1); // Elimina el producto del carrito
+        }
 
-    localStorage.setItem('carrito', JSON.stringify(carrito));
-    mostrarCarrito();
+        // Actualizamos el carrito en LocalStorage
+        localStorage.setItem('carrito', JSON.stringify(carrito));
+        mostrarCarrito();
+    }
 }
+    
+
 
 function eliminarProducto(id) {
     let carrito = obtenerCarrito();
