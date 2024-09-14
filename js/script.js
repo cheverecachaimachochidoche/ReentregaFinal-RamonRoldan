@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     fetch('https://cheverecachaimachochidoche.github.io/ReentregaFinal-RamonRoldan/db/main.json')
         .then(response => {
             if (!response.ok) {
-                throw new Error('Network response was not ok');
+                throw new Error('Falla');
             }
             return response.json();
         })
