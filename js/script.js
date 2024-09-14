@@ -1,25 +1,20 @@
-document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('finalizar-compra')?.addEventListener('click', finalizarCompra);
-    document.getElementById('vaciar-carrito')?.addEventListener('click', vaciarCarrito);
-    document.getElementById('form-checkout')?.addEventListener('submit', manejo);
-    mostrarCarrito();
-});
-
 let productos = [];
 
 // Cargar productos del archivo JSON
-fetch('https://cheverecachaimachochidoche.github.io/Tercera-Entrega-RamonRoldan/db/main.json')
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        return response.json();
-    })
-    .then(data => {
-        productos = data;
-        mostrarCarrito();
-    })
-    .catch(error => console.error('Error al cargar los productos:', error));
+document.addEventListener('DOMContentLoaded', () => {
+    fetch('https://cheverecachaimachochidoche.github.io/Tercera-Entrega-RamonRoldan/db/main.json')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            productos = data;
+            mostrarCarrito();
+        })
+        .catch(error => console.error('Error al cargar los productos:', error));
+});
 
 function agregarCarrito(e) {
     const idProducto = parseInt(e.target.getAttribute('data-id'));
@@ -132,7 +127,11 @@ function eliminarProducto(id) {
 }
 
 function obtenerCarrito() {
-    return JSON.parse(localStorage.getItem('carrito')) || [];
+    if (localStorage.getItem('carrito')) {
+        return JSON.parse(localStorage.getItem('carrito'));
+    } else {
+        return [];
+    }
 }
 
 function actualizarUI() {
@@ -177,31 +176,41 @@ function finalizarCompra() {
     const productosCount = {};
     let totalGeneral = 0;
 
+    // Agrupar los productos por nombre y contar la cantidad total
     carrito.forEach(producto => {
         if (productosCount[producto.nombre]) {
-            productosCount[producto.nombre].cantidad++;
+            productosCount[producto.nombre].cantidad += producto.cantidad;
         } else {
             productosCount[producto.nombre] = {
-                cantidad: 1,
+                cantidad: producto.cantidad,
                 precio: producto.precio
             };
         }
     });
 
-    Object.keys(productosCount).forEach(producto => {
-        const cantidad = productosCount[producto].cantidad;
-        const precio = productosCount[producto].precio;
+    // Generar el HTML para el resumen de la compra
+    Object.keys(productosCount).forEach(nombre => {
+        const cantidad = productosCount[nombre].cantidad;
+        const precio = productosCount[nombre].precio;
         const total = cantidad * precio;
         totalGeneral += total;
-        resumenHTML += `<li>${cantidad} x ${producto} - $${total.toFixed(2)}</li>`;
+        resumenHTML += `<li>${cantidad} x ${nombre} - $${total.toFixed(2)}</li>`;
     });
 
     resumenHTML += `<li>Total: $${totalGeneral.toFixed(2)}</li></ul>`;
     document.getElementById('resumen-compra').innerHTML = resumenHTML;
 
+    // Mostrar la sección de checkout
     document.getElementById('checkout-section').style.display = 'block';
     document.getElementById('carrito').style.display = 'none';
     document.getElementById('cart-summary').style.display = 'none';
+
+    // Asegúrate de remover eventos previos
+    const form = document.getElementById('form-checkout');
+    if (form) {
+        form.removeEventListener('submit', manejo); // Eliminar manejador previo
+        form.addEventListener('submit', manejo); // Agregar manejador
+    }
 }
 
 function manejo(event) {
@@ -215,6 +224,6 @@ function manejo(event) {
         localStorage.removeItem('carrito');
         mostrarCarrito();
         document.getElementById('checkout-section').style.display = 'none';
-        window.location.href = '../index.html'; // Asegúrate de que la ruta sea correcta
+        window.location.href = '../index.html'; // Redirigir a la página de inicio
     });
 }
