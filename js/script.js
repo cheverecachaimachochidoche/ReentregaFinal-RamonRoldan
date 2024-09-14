@@ -2,12 +2,6 @@ let productos = [];
 
 // Esperar que el DOM esté cargado
 document.addEventListener('DOMContentLoaded', () => {
-    // Ocultar el botón de finalizar compra al cargar la página
-    const finalizarCompraBtn = document.getElementById('finalizar-compra');
-    if (finalizarCompraBtn) {
-        finalizarCompraBtn.style.display = 'none';
-    }
-    
     fetch('https://cheverecachaimachochidoche.github.io/Tercera-Entrega-RamonRoldan/db/main.json')
         .then(response => {
             if (!response.ok) {
@@ -70,8 +64,7 @@ function mostrarCarrito() {
                 <button class="btn btn-success" onclick="incrementarCantidad(${producto.id})">+</button>
                 <button class="btn btn-danger" onclick="disminuirCantidad(${producto.id})">-</button>
                 <button class="btn btn-secondary" onclick="eliminarProducto(${producto.id})">Eliminar</button>
-            </div>
-        `;
+            </div>`;
         carritoItems.appendChild(div);
         total += producto.precio * producto.cantidad;
     }
@@ -122,22 +115,14 @@ function cargarCarrito() {
 
 function actualizarUI() {
     const carrito = obtenerCarrito();
-    const finalizarCompraBtn = document.getElementById('finalizar-compra');
-    const vaciarCarritoBtn = document.getElementById('vaciar-carrito');
-
+    const finalizarCompra = document.getElementById('finalizar-compra');
     if (carrito.length === 0) {
-        if (finalizarCompraBtn) {
-            finalizarCompraBtn.style.display = 'none';
-        }
-        if (vaciarCarritoBtn) {
-            vaciarCarritoBtn.style.display = 'none';
+        if (finalizarCompra) {
+            finalizarCompra.style.display = 'none';
         }
     } else {
-        if (finalizarCompraBtn) {
-            finalizarCompraBtn.style.display = 'block';
-        }
-        if (vaciarCarritoBtn) {
-            vaciarCarritoBtn.style.display = 'block';
+        if (finalizarCompra) {
+            finalizarCompra.style.display = 'block';
         }
     }
 }
@@ -198,9 +183,6 @@ function finalizarCompra() {
     document.getElementById('carrito').style.display = 'none';
     document.getElementById('total-price').style.display = 'none';
 
-    // Ocultar el botón de "Finalizar Compra"
-    document.getElementById('finalizar-compra').style.display = 'none';
-
     // Asignar evento al botón de confirmar compra
     document.getElementById('form-checkout').addEventListener('submit', function (event) {
         event.preventDefault(); // Evitar el envío del formulario
@@ -209,16 +191,16 @@ function finalizarCompra() {
             icon: 'success',
             title: 'Compra confirmada',
             text: 'Gracias por tu compra. Pronto recibirás tu pedido.'
-        }).then(() => {
-            // Limpiar carrito
-            localStorage.removeItem('carrito');
-            mostrarCarrito(); // Actualizar la UI para reflejar que el carrito está vacío
-
-            // Ocultar el formulario de checkout tras la compra
-            document.getElementById('checkout-section').style.display = 'none';
-
-            // Redirigir al usuario a la página de inicio
-            window.location.href = '../index.html'; // Cambia la ruta según sea necesario
         });
+
+        // Limpiar carrito
+        localStorage.removeItem('carrito');
+        mostrarCarrito(); // Actualizar la UI para reflejar que el carrito está vacío
+
+        // Ocultar el formulario de checkout tras la compra
+        document.getElementById('checkout-section').style.display = 'none';
+
+        // Redirigir a la página de inicio
+        window.location.href = '/'; // Cambia esta URL a la página de inicio de tu sitio
     });
 }
